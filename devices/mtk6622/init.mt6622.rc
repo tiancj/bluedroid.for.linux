@@ -1,0 +1,23 @@
+on post-fs
+
+on post-fs-data
+# mainly do mkdir/insmod/mknod in this section
+
+#
+# MT6622 related device nodes & modules & configuration (begin)
+#
+
+on post-fs-data
+  mkdir /data/bluetooth 0711 bluetooth bluetooth
+
+on boot
+  chmod 0666 /dev/ttyS2
+  chown bluetooth bluetooth /dev/ttyS2
+  
+  chmod 0660 /dev/bthwctl
+  chown bluetooth radio /dev/bthwctl
+
+
+# MT6622 related services (End)
+
+

@@ -1,0 +1,33 @@
+
+# Configuration
+RTK_BT_FIRMWARE_DIR := firmware/rtl8723as
+LOCAL_PATH := $(call my-dir)
+
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := rtk8723_bt_config
+LOCAL_MODULE_TAGS := optional eng
+LOCAL_MODULE_CLASS := ETC
+LOCAL_MODULE_PATH := $(TARGET_OUT_ETC)/$(RTK_BT_FIRMWARE_DIR)
+LOCAL_SRC_FILES := $(LOCAL_MODULE)
+include $(BUILD_PREBUILT)
+
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := rlt8723a_chip_b_cut_bt40_fw
+LOCAL_MODULE_TAGS := optional eng
+LOCAL_MODULE_CLASS := ETC
+LOCAL_MODULE_PATH := $(TARGET_OUT_ETC)/$(RTK_BT_FIRMWARE_DIR)
+LOCAL_SRC_FILES := $(LOCAL_MODULE)
+include $(BUILD_PREBUILT)
+
+
+
+
+
+
+
+
+
+
+
