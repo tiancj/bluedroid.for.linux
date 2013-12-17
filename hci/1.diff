@@ -1,0 +1,125 @@
+diff --git a/hci/src/hci_h5.c b/hci/src/hci_h5.c
+index 98718b9..6e7d712 100755
+--- a/hci/src/hci_h5.c
++++ b/hci/src/hci_h5.c
+@@ -139,6 +139,8 @@
+ #define H5_VDRSPEC_PKT	        0x0E
+ #define H5_LINK_CTL_PKT         0x0F
+ 
++extern int hci_btsnoop_fd;
++
+ 
+ /* BD Address */
+ typedef struct {
+@@ -676,6 +678,13 @@ void skb_pull(OUT  sk_buff * skb, IN uint32_t len)
+     return;
+ }
+ 
++void skb_push(OUT sk_buff *skb, IN uint32_t len)
++{
++	RTK_BUFFER *rtb = (RTK_BUFFER *)skb;
++	RtbAddHead(rtb, len);
++	return;
++}
++
+ sk_buff * 
+ skb_alloc_and_init(
+ 	IN uint8_t 	PktType,
+@@ -2034,11 +2043,13 @@ uint8_t hci_rx_dispatch_by_handle(sk_buff* rx_skb)
+             hci_conn->rx_skb = skb_total;
+             //update hci total length
+             skb_set_hci_data_length(hci_conn->rx_skb, hci_len_rx_skb_cur + hci_len_rx_skb_last);                    
+-            
++
++            skb_push(rx_skb, HCI_ACL_PREAMBLE_SIZE);
+         }
+         else
+         {
+             ALOGE("skb_alloc fail");
++			skb_push(rx_skb, HCI_ACL_PREAMBLE_SIZE);
+             return 0;
+         }
+     }
+@@ -2145,6 +2156,29 @@ static void h5_complete_rx_pkt(struct tHCI_H5_CB *h5)
+     {
+ 
+         skb_pull(h5->rx_skb, sizeof(H5_PKT_HEADER));
++#if 1
++		if (hci_btsnoop_fd != -1)
++		{
++			uint16_t len = 0;
++			HC_BT_HDR *rcv_msg = NULL;
++
++			len = BT_HC_HDR_SIZE + skb_get_data_length(h5->rx_skb);
++			rcv_msg = (HC_BT_HDR *) bt_hc_cbacks->alloc(len);
++
++			if (rcv_msg)
++			{
++				/* Initialize buffer with received h5 data */
++				rcv_msg->offset = 0;
++				rcv_msg->layer_specific = 0;
++				rcv_msg->event = eventtype;
++				rcv_msg->len = skb_get_data_length(h5->rx_skb);
++				memcpy((uint8_t *)(rcv_msg + 1), skb_get_data(h5->rx_skb), skb_get_data_length(h5->rx_skb));
++
++				btsnoop_capture(rcv_msg, TRUE);
++				bt_hc_cbacks->dealloc((TRANSAC)rcv_msg, (char *)(rcv_msg + 1));
++			}
++		}
++#endif
+ 
+         if(eventtype == MSG_HC_TO_STACK_HCI_ACL)
+         {
+@@ -2174,9 +2208,31 @@ static void h5_complete_rx_pkt(struct tHCI_H5_CB *h5)
+                 memcpy((uint8_t *)(h5->p_rcv_msg + 1), skb_get_data(skb_complete_pkt), skb_get_data_length(skb_complete_pkt));
+             }
+ 
++			// TODO: capture rx packet
++			btsnoop_capture(h5->p_rcv_msg, TRUE);
++
+             hci_recv_frame(skb_complete_pkt, pkt_type);
+         }
+-      
++#if 0
++		else  {
++			// TODO: capture rx packet
++			uint16_t len = BT_HC_HDR_SIZE + skb_get_data_length(h5->rx_skb);
++			HC_BT_HDR *rcv_msg = (HC_BT_HDR *) bt_hc_cbacks->alloc(len);
++
++			if (rcv_msg)
++			{
++				/* Initialize buffer with received h5 data */
++				rcv_msg->offset = 0;
++				rcv_msg->layer_specific = 0;
++				rcv_msg->event = eventtype;
++				rcv_msg->len = skb_get_data_length(h5->rx_skb);
++				memcpy((uint8_t *)(rcv_msg + 1), skb_get_data(h5->rx_skb), skb_get_data_length(h5->rx_skb));
++			
++				btsnoop_capture(rcv_msg, TRUE);
++				bt_hc_cbacks->dealloc((TRANSAC)rcv_msg, (char *)(rcv_msg + 1));
++			}
++        }
++#endif
+     }
+   
+ 
+diff --git a/main/bte_logmsg.c b/main/bte_logmsg.c
+index 7035a57..de25474 100755
+--- a/main/bte_logmsg.c
++++ b/main/bte_logmsg.c
+@@ -98,6 +98,7 @@
+ #include "bta_api.h"
+ #endif
+ 
++#include "hidh_api.h"
+ 
+ #if defined(__CYGWIN__) || defined(__linux__)
+ #undef RPC_INCLUDED
+@@ -449,6 +450,7 @@ tBTTRC_FUNC_MAP bttrc_set_level_map[] = {
+ #if (DUN_INCLUDED==TRUE)
+     {BTTRC_ID_STK_DUN, BTTRC_ID_STK_DUN, DUN_SetTraceLevel, "TRC_DUN", DEFAULT_CONF_TRACE_LEVEL},
+ #endif
++	{BTTRC_ID_STK_HID, BTTRC_ID_STK_HID, HID_HostSetTraceLevel, "TRC_HID", DEFAULT_CONF_TRACE_LEVEL},
+ #if (GAP_INCLUDED==TRUE)
+     {BTTRC_ID_STK_GAP, BTTRC_ID_STK_GAP, GAP_SetTraceLevel, "TRC_GAP", DEFAULT_CONF_TRACE_LEVEL},
+ #endif

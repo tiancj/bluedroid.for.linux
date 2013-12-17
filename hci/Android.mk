@@ -1,0 +1,65 @@
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES := \
+        src/bt_hci_bdroid.c \
+        src/lpm.c \
+        src/bt_hw.c \
+        src/btsnoop.c \
+        src/utils.c
+
+ifeq ($(BLUETOOTH_HCI_USE_MCT),true)
+
+LOCAL_CFLAGS := -DHCI_USE_MCT
+
+LOCAL_SRC_FILES += \
+        src/hci_mct.c \
+        src/userial_mct.c
+
+else
+#ifeq ($(BLUETOOTH_HCI_USE_RTK_H5),true)    
+ifeq ($(strip $(R_BT_TYPE)), rtl8723)
+
+LOCAL_CFLAGS := -DHCI_USE_RTK_H5
+
+LOCAL_SRC_FILES += \
+       src/hci_h5.c \
+       src/userial.c \
+	src/bt_skbuff.c \
+	src/bt_list.c
+
+else
+ 
+ifeq ($(strip $(R_BT_TYPE)), mt6622)
+
+LOCAL_SRC_FILES += \
+        src/hci_h4_mtk.c \
+        src/userial.c
+else
+LOCAL_SRC_FILES += \
+        src/hci_h4.c \
+        src/userial.c
+endif
+
+endif
+
+endif
+
+LOCAL_C_INCLUDES += \
+        $(LOCAL_PATH)/include \
+        $(LOCAL_PATH)/../utils/include
+
+LOCAL_SHARED_LIBRARIES := \
+        libcutils \
+        libdl \
+        libbt-utils
+
+LOCAL_MODULE := libbt-hci
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+
+
+LOCAL_ADDITIONAL_DEPENDENCIES :=$(ACTIONS_ANDROID_ADDITIONAL_DEP) 
+
+include $(BUILD_SHARED_LIBRARY)
