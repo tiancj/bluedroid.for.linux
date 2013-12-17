@@ -4773,6 +4773,11 @@ extern UINT8 btif_trace_level;
 #define DRV_TRACE_DEBUG6(m,p1,p2,p3,p4,p5,p6)  APPL_TRACE_DEBUG6(m,p1,p2,p3,p4,p5,p6)
 
 
+#define ALOGI(...)
+#define ALOGD(...)
+#define ALOGW(...)
+#define ALOGE(...)
+
 #endif /* BT_TRACE_H */
 
 

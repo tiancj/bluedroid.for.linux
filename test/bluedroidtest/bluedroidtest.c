@@ -45,7 +45,8 @@
 #include <private/android_filesystem_config.h>
 #include <android/log.h>
 #endif
-
+#define LOGE(...)
+#define LOGV(...)
 #include <hardware/hardware.h>
 #include <hardware/bluetooth.h>
 
@@ -437,6 +438,126 @@ static int create_cmdjob(char *cmd)
 /*******************************************************************************
  ** Load stack lib
  *******************************************************************************/
+#ifdef LINUX_NATIVE
+static int load(const char *id,
+        const char *path,
+        const struct hw_module_t **pHmi)
+{
+    int status;
+    void *handle;
+    struct hw_module_t *hmi;
+
+    /*
+     * load the symbols resolving undefined symbols before
+     * dlopen returns. Since RTLD_GLOBAL is not or'd in with
+     * RTLD_NOW the external symbols will not be global
+     */
+    handle = dlopen(path, RTLD_NOW);
+    if (handle == NULL) {
+        char const *err_str = dlerror();
+        printf("load: module=%s\n%s", path, err_str?err_str:"unknown");
+        status = -EINVAL;
+        goto done;
+    }
+
+    /* Get the address of the struct hal_module_info. */
+    const char *sym = HAL_MODULE_INFO_SYM_AS_STR;
+    hmi = (struct hw_module_t *)dlsym(handle, sym);
+    if (hmi == NULL) {
+        printf("load: couldn't find symbol %s", sym);
+        status = -EINVAL;
+        goto done;
+    }
+
+    /* Check that the id matches */
+    if (strcmp(id, hmi->id) != 0) {
+        printf("load: id=%s != hmi->id=%s", id, hmi->id);
+        status = -EINVAL;
+        goto done;
+    }
+
+    hmi->dso = handle;
+
+    /* success */
+    status = 0;
+
+    /* Check that the id matches */
+    if (strcmp(id, hmi->id) != 0) {
+        printf("load: id=%s != hmi->id=%s", id, hmi->id);
+        status = -EINVAL;
+        goto done;
+    }
+
+    hmi->dso = handle;
+
+    /* success */
+    status = 0;
+
+done:
+    if (status != 0) {
+        hmi = NULL;
+        if (handle != NULL) {
+            dlclose(handle);
+            handle = NULL;
+        }
+    } else {
+        printf("loaded HAL id=%s path=%s hmi=%p handle=%p",
+                id, path, *pHmi, handle);
+    }
+
+    *pHmi = hmi;
+
+    return status;
+}
+
+int hw_get_module(const char *id, const struct hw_module_t **module)
+{
+#if 0
+    int status;
+    int i;
+    const struct hw_module_t *hmi = NULL;
+    char prop[PATH_MAX];
+    char path[PATH_MAX];
+
+    /*
+     * Here we rely on the fact that calling dlopen multiple times on
+     * the same .so will simply increment a refcount (and not load
+     * a new copy of the library).
+     * We also assume that dlopen() is thread-safe.
+     */
+
+    /* Loop through the configuration variants looking for a module */
+    for (i=0 ; i<HAL_VARIANT_KEYS_COUNT+1 ; i++) {
+        if (i < HAL_VARIANT_KEYS_COUNT) {
+            if (property_get(variant_keys[i], prop, NULL) == 0) {
+                continue;
+            }
+            snprintf(path, sizeof(path), "%s/%s.%s.so",
+                    HAL_LIBRARY_PATH, id, prop);
+        } else {
+            snprintf(path, sizeof(path), "%s/%s.default.so",
+                    HAL_LIBRARY_PATH, id);
+        }
+        if (access(path, R_OK)) {
+            continue;
+        }
+        /* we found a library matching this id/variant */
+        break;
+    }
+
+    status = -ENOENT;
+    if (i < HAL_VARIANT_KEYS_COUNT+1) {
+        /* load the module, if this fails, we're doomed, and we should not try
+         * to load a different variant. */
+        status = load(id, path, module);
+    }
+#endif
+	status = load(id, "bluetooth.default.so", module);
+    return status;
+}
+
+#endif
+
 
 int HAL_load(void)
 {
@@ -447,7 +568,7 @@ int HAL_load(void)
 
     bdt_log("Loading HAL lib + extensions");
 
-#ifndef LINUX_NATIVE
+//#ifndef LINUX_NATIVE
     err = hw_get_module(BT_HARDWARE_MODULE_ID, (hw_module_t const**)&module);
     if (err == 0)
     {
@@ -457,9 +578,9 @@ int HAL_load(void)
             sBtInterface = bt_device->get_bluetooth_interface();
         }
     }
-#else
-	sBtInterface = bluetooth__get_bluetooth_interface();
-#endif
+//#else
+//	sBtInterface = bluetooth__get_bluetooth_interface();
+//#endif
 
     bdt_log("HAL library loaded (%s)", strerror(err));
 

@@ -17,7 +17,7 @@ set(LOCAL_MODULE libbt-hci)
 
 
 include_directories(${LOCAL_C_INCLUDES})
-add_library(${LOCAL_MODULE} ${LOCAL_SRC_FILES})
+add_library(${LOCAL_MODULE} SHARED ${LOCAL_SRC_FILES})
 set_target_properties(${LOCAL_MODULE} PROPERTIES PREFIX "")
 #target_link_libraries(${LOCAL_MODULE} ${CMAKE_DL_LIBS} module -lrt)
 target_link_libraries(${LOCAL_MODULE} -lrt -ldl)

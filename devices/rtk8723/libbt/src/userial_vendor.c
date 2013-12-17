@@ -33,6 +33,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
 #include "bt_vendor_rtk.h"
 #include "userial.h"
 #include "userial_vendor.h"

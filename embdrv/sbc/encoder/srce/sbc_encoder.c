@@ -25,6 +25,7 @@
 #include <string.h>
 #include "sbc_encoder.h"
 #include "sbc_enc_func_declare.h"
+#define APPL_TRACE_EVENT2(...)
 
 SINT16 EncMaxShiftCounter;
 
