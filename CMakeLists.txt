@@ -1,4 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
+
+# Cross-Compiler
+set(CMAKE_C_COMPILER "arm-none-linux-gnueabi-gcc")
+set(CMAKE_CXX_COMPILER "arm-none-linux-gnueabi-g++")
+
 project(BLUEDROID_FOR_LINUX)
 add_definitions("-DHAS_BDROID_BUILDCFG -DLINUX_NATIVE -DANDROID_USE_LOGCAT=FALSE")
 # bdroid_CFLAGS := -DHAS_BDROID_BUILDCFG
