@@ -26,17 +26,23 @@
 
 #undef NDEBUG
 #define LOG_TAG "bt_vendor"
+#ifndef LINUX_NATIVE
 #include <utils/Log.h>
+#endif
+#include <stdio.h>
+#include <string.h>
 #include "bt_vendor_rtk.h"
 #include "upio.h"
 #include "userial_vendor.h"
 
 #ifndef BTVND_DBG
-#define BTVND_DBG TRUE
+#define BTVND_DBG FALSE
 #endif
 
 #if (BTVND_DBG == TRUE)
 #define BTVNDDBG(param, ...) {ALOGD(param, ## __VA_ARGS__);} 
+#define ALOGI(...)
+#define ALOGD(...)
 #else
 #define BTVNDDBG(param, ...) {}
 #endif

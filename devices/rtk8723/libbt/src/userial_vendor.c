@@ -26,7 +26,9 @@
 #undef NDEBUG
 #define LOG_TAG "bt_userial_vendor"
 
+#ifndef LINUX_NATIVE
 #include <utils/Log.h>
+#endif
 #include <termios.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -43,6 +45,9 @@
 #define VNDUSERIAL_DBG TRUE
 #endif
 
+#define ALOGI(...)
+#define ALOGD(...)
+#define ALOGE(...)
 #if (VNDUSERIAL_DBG == TRUE)
 #define VNDUSERIALDBG(param, ...) {ALOGD(param, ## __VA_ARGS__);}
 #else

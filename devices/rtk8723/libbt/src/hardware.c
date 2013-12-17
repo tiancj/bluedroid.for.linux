@@ -28,7 +28,9 @@
 
 #define LOG_TAG "bt_hwcfg"
 
+#ifndef LINUX_NATIVE
 #include <utils/Log.h>
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <signal.h>
@@ -37,7 +39,11 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include <ctype.h>
+#include <stdio.h>
+#include <string.h>
+#ifndef LINUX_NATIVE
 #include <cutils/properties.h>
+#endif
 #include <stdlib.h>
 #include "bt_hci_bdroid.h"
 #include "bt_vendor_rtk.h"
@@ -58,6 +64,10 @@
 #else
 #define BTHWDBG(param, ...) {}
 #endif
+
+#define ALOGI(...)
+#define ALOGD(...)
+#define ALOGE(...)
 
 
 #define HCI_UART_H4	0

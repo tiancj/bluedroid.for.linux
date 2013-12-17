@@ -3,7 +3,7 @@
 #define _VND_BUILDCFG_H
 #define BLUETOOTH_UART_DEVICE_PORT   "/dev/ttyS3"
 #define FW_PATCHFILE_LOCATION   "/etc/firmware/rtl8723as"
-#define BT_WAKE_VIA_PROC   TRUE
+#define BT_WAKE_VIA_PROC   FALSE
 #define LPM_IDLE_TIMEOUT_MULTIPLE   5
 #define BTVND_DBG   TRUE
 #define BTHW_DBG   TRUE

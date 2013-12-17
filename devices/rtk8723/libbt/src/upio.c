@@ -28,10 +28,13 @@
 
 #define LOG_TAG "bt_upio"
 
+#ifndef LINUX_NATIVE
 #include <utils/Log.h>
+#include <cutils/properties.h>
+#endif
 #include <fcntl.h>
 #include <errno.h>
-#include <cutils/properties.h>
+#include <string.h>
 #include "bt_vendor_rtk.h"
 #include "upio.h"
 #include "userial_vendor.h"
@@ -44,6 +47,9 @@
 #define UPIO_DBG FALSE
 #endif
 
+#define ALOGI(...)
+#define ALOGD(...)
+#define ALOGE(...)
 #if (UPIO_DBG == TRUE)
 #define UPIODBG(param, ...) {ALOGD(param, ## __VA_ARGS__);}
 #else
@@ -118,6 +124,9 @@ static char *lpm_state[] = {
 *****************************************************************************/
 static int is_emulator_context(void)
 {
+#ifdef LINUX_NATIVE
+	return 0;
+#else
     char value[PROPERTY_VALUE_MAX];
 
     property_get("ro.kernel.qemu", value, "0");
@@ -126,10 +135,14 @@ static int is_emulator_context(void)
         return 1;
     }
     return 0;
+#endif
 }
 
 static int is_rfkill_disabled(void)
 {
+#ifdef LINUX_NATIVE
+    return UPIO_BT_POWER_OFF;
+#else
     char value[PROPERTY_VALUE_MAX];
 
     property_get("ro.rfkilldisabled", value, "0");
@@ -140,6 +153,7 @@ static int is_rfkill_disabled(void)
     }
 
     return UPIO_BT_POWER_OFF;
+#endif
 }
 
 static int init_rfkill()
