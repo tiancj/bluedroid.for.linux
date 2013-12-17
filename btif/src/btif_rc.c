@@ -24,6 +24,7 @@
  *  Description:   Bluetooth AVRC implementation
  *
  *****************************************************************************/
+#include <string.h>
 #include <hardware/bluetooth.h>
 #include <fcntl.h>
 #include "bta_api.h"
@@ -43,6 +44,8 @@
 
 /* cod value for Headsets */
 #define COD_AV_HEADSETS        0x0404
+
+#define ALOGV(...)
 
 
 /*****************************************************************************

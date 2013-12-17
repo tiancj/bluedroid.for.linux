@@ -168,6 +168,7 @@ const char * const bt_layer_tags[] = {
 
 #else
 #undef ANDROID_USE_LOGCAT
+#define ALOGI(...)
 #endif
 
 #endif

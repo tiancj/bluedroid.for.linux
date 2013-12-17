@@ -29,6 +29,7 @@
 #include <utils/Log.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <string.h>
 #include "bt_hci_bdroid.h"
 #include "hci.h"
 #include "userial.h"

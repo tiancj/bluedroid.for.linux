@@ -25,6 +25,7 @@
  *
  ***********************************************************************************/
 
+#include <string.h>
 #include <hardware/bluetooth.h>
 #include <hardware/bt_sock.h>
 #include <sys/types.h>
@@ -52,7 +53,9 @@
 #include "../bta/pb/bta_pbs_int.h"
 #include "../include/bta_op_api.h"
 #include "bta_jv_api.h"
+#ifndef LINUX_NATIVE
 #include <cutils/log.h>
+#endif
 
 #define RESERVED_SCN_PBS 19
 #define RESERVED_SCN_OPS 12

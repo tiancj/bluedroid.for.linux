@@ -20,8 +20,10 @@
 #include <stdint.h>
 #include <sys/cdefs.h>
 
+#ifndef LINUX_NATIVE
 #include <cutils/native_handle.h>
 #include <system/graphics.h>
+#endif
 
 __BEGIN_DECLS
 

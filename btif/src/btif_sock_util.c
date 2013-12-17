@@ -41,7 +41,9 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 
+#ifndef LINUX_NATIVE
 #include <cutils/sockets.h>
+#endif
 #include <netinet/tcp.h>
 
 
@@ -163,7 +165,8 @@ int sock_send_fd(int sock_fd, const uint8_t* buf, int len, int send_fd)
 }
 
 
-#define PRINT(s) __android_log_write(ANDROID_LOG_DEBUG, NULL, s)
+//#define PRINT(s) __android_log_write(ANDROID_LOG_DEBUG, NULL, s)
+#define PRINT(s) 
 static const char* hex_table = "0123456789abcdef";
 static inline void byte2hex(const char* data, char** str)
 {

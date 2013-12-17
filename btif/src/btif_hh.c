@@ -82,6 +82,10 @@ static int btif_hh_keylockstates=0; //The current key state of each key
 #define BTUI_HH_MOUSE_SECURITY (BTA_SEC_NONE)
 #endif
 
+#ifdef LINUX_NATIVE
+#define ALOGE(...)
+#define ALOGI(...)
+#endif
 /* HH request events */
 typedef enum
 {

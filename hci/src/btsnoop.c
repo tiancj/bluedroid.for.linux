@@ -38,6 +38,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <signal.h>
 
 /* for gettimeofday */
 #include <sys/time.h>
@@ -51,7 +52,14 @@
 #include <fcntl.h>
 
 #define LOG_TAG "BTSNOOP-DISP"
+#ifndef LINUX_NATIVE
 #include <cutils/log.h>
+#endif
+
+#ifdef LINUX_NATIVE
+#define ALOGD(...) 
+#define ALOGE(...) 
+#endif
 
 #include "bt_hci_bdroid.h"
 #include "utils.h"

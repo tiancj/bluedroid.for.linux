@@ -25,6 +25,8 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <time.h>
+#include <string.h>
+#include <stdlib.h>
 #include <limits.h>
 #include "gki.h"
 #include "bta_fs_co.h"

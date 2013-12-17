@@ -415,7 +415,7 @@
 #endif
 
 #ifndef BTIF_DM_OOB_TEST
-#define BTIF_DM_OOB_TEST  TRUE
+#define BTIF_DM_OOB_TEST  FALSE
 #endif
 //------------------End added from Bluedroid buildcfg.h---------------------
 

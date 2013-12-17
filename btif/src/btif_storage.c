@@ -27,6 +27,7 @@
  *
  */
 #include <stdlib.h>
+#include <stdio.h>
 #include <time.h>
 #include <string.h>
 #include <ctype.h>
@@ -45,7 +46,11 @@
 #include "bta_hh_api.h"
 #include "btif_hh.h"
 
+#ifndef LINUX_NATIVE
 #include <cutils/log.h>
+#else
+#define ALOGE(...)
+#endif
 
 /************************************************************************************
 **  Constants & Macros

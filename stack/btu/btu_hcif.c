@@ -1531,7 +1531,7 @@ void btu_hcif_cmd_timeout (UINT8 controller_id)
     STREAM_TO_UINT16 (opcode, p);
 
 // btla-specific ++
-#if (defined(ANDROID_APP_INCLUDED) && (ANDROID_APP_INCLUDED == TRUE))
+#if (defined(ANDROID_APP_INCLUDED) && (ANDROID_APP_INCLUDED == TRUE)) && (!defined(LINUX_NATIVE))
     ALOGE("######################################################################");
     ALOGE("#");
     ALOGE("# WARNING : BTU HCI(id=%d) command timeout. opcode=0x%x", controller_id, opcode);

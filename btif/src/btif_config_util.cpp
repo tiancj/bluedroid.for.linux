@@ -44,12 +44,20 @@ extern "C" {
 #include "btif_sock_util.h"
 }
 #include <stdlib.h>
+#ifndef LINUX_NATIVE
 #include <cutils/log.h>
 #define info(fmt, ...)  ALOGI ("%s(L%d): " fmt,__FUNCTION__, __LINE__,  ## __VA_ARGS__)
 #define debug(fmt, ...) ALOGD ("%s(L%d): " fmt,__FUNCTION__, __LINE__,  ## __VA_ARGS__)
 #define warn(fmt, ...) ALOGW ("## WARNING : %s(L%d): " fmt "##",__FUNCTION__, __LINE__, ## __VA_ARGS__)
 #define error(fmt, ...) ALOGE ("## ERROR : %s(L%d): " fmt "##",__FUNCTION__, __LINE__, ## __VA_ARGS__)
 #define asrt(s) if(!(s)) ALOGE ("## %s assert %s failed at line:%d ##",__FUNCTION__, #s, __LINE__)
+#else
+#define info(fmt, ...) 
+#define debug(fmt, ...)
+#define warn(fmt, ...) 
+#define error(fmt, ...) 
+#define asrt(s) 
+#endif
 
 #define BLUEDROID_ROOT "Bluedroid"
 #define BLUEDROID_NAME_TAG "Tag"

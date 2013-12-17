@@ -31,6 +31,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/socket.h>
 #include "bt_hci_bdroid.h"
 #include "userial.h"

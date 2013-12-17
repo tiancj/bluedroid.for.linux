@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include <hardware/bluetooth.h>
@@ -42,6 +43,10 @@
 #include "btif_api.h"
 #include "bt_utils.h"
 
+
+#ifdef LINUX_NATIVE
+#define ALOGI(...)
+#endif
 /************************************************************************************
 **  Constants & Macros
 ************************************************************************************/

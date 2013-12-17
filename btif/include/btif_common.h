@@ -23,18 +23,21 @@
 #include "bt_types.h"
 #include "bta_api.h"
 
-#ifndef LOG_TAG
+#if !defined(LOG_TAG) && !defined(LINUX_NATIVE)
 #error "LOG_TAG not defined, please add in .c file prior to including bt_common.h"
 #endif
-
 #include <utils/Log.h>
 
 /*******************************************************************************
 **  Constants & Macros
 ********************************************************************************/
 
+#ifndef LINUX_NATIVE
 #define ASSERTC(cond, msg, val) if (!(cond)) { ALOGE( \
     "### ASSERT : %s line %d %s (%d) ###", __FILE__, __LINE__, msg, val);}
+#else
+#define ASSERTC(cond, msg, val) 
+#endif
 
 /* Calculate start of event enumeration; id is top 8 bits of event */
 #define BTIF_SIG_START(id)       ((id) << 8)

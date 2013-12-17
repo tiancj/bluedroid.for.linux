@@ -23,7 +23,7 @@
  *  Description:   Bluetooth remote device connection queuing implementation.
  *
  ******************************************************************************/
-
+#include <string.h>
 #include <hardware/bluetooth.h>
 
 #define LOG_TAG "BTIF_QUEUE"

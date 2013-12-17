@@ -56,9 +56,19 @@ DEV_CLASS local_device_default_class = {0x40, 0x02, 0x0C};
 **  Local type definitions
 ******************************************************************************/
 #define CONF_DBG          0
+#ifdef LINUX_NATIVE
 #define info(format, ...) ALOGI (format, ## __VA_ARGS__)
 #define debug(format, ...) if (CONF_DBG) ALOGD (format, ## __VA_ARGS__)
 #define error(format, ...) ALOGE (format, ## __VA_ARGS__)
+#else
+#define info(format, ...) 
+#define debug(format, ...) 
+#define error(format, ...) 
+
+#define ALOGI(...)
+#define ALOGD(...)
+#define ALOGE(...)
+#endif
 
 #define CONF_KEY_LEN   32
 #define CONF_VALUE_LEN 96

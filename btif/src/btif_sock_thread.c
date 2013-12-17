@@ -24,6 +24,7 @@
  *
  *
  ***********************************************************************************/
+#define _GNU_SOURCE
 
 #include <hardware/bluetooth.h>
 #include <hardware/bt_sock.h>
@@ -33,6 +34,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <poll.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -45,7 +47,9 @@
 
 #include <sys/select.h>
 #include <sys/poll.h>
+#ifndef LINUX_NATIVE
 #include <cutils/sockets.h>
+#endif
 #include <alloca.h>
 
 #define LOG_TAG "BTIF_SOCK"
@@ -59,7 +63,7 @@
 #include "btif_sock_thread.h"
 #include "btif_sock_util.h"
 
-#include <cutils/log.h>
+//#include <cutils/log.h>
 #define asrt(s) if(!(s)) APPL_TRACE_ERROR3("## %s assert %s failed at line:%d ##",__FUNCTION__, #s, __LINE__)
 #define print_events(events) do { \
     APPL_TRACE_DEBUG1("print poll event:%x", events); \
@@ -83,6 +87,10 @@
 #define CMD_EXIT         2
 #define CMD_ADD_FD       3
 #define CMD_USER_PRIVATE 4
+
+#ifdef LINUX_NATIVE
+#define ANDROID_SOCKET_NAMESPACE_ABSTRACT 0
+#endif
 
 typedef struct {
     struct pollfd pfd;
@@ -122,6 +130,73 @@ static inline void set_socket_blocking(int s, int blocking)
     else opts |= O_NONBLOCK;
     fcntl(s, F_SETFL, opts);
 }
+
+#ifdef LINUX_NATIVE
+#define offsetof(s,memb) \
+	    ((size_t)((char *)&((s *)0)->memb-(char *)0))
+int socket_make_sockaddr_un(const char *name, int namespaceId, 
+        struct sockaddr_un *p_addr, socklen_t *alen)
+{
+    memset (p_addr, 0, sizeof (*p_addr));
+    size_t namelen;
+
+    switch (namespaceId) {
+        case ANDROID_SOCKET_NAMESPACE_ABSTRACT:
+            namelen  = strlen(name);
+
+            // Test with length +1 for the *initial* '\0'.
+            if ((namelen + 1) > sizeof(p_addr->sun_path)) {
+                goto error;
+            }
+
+            /*
+             * Note: The path in this case is *not* supposed to be
+             * '\0'-terminated. ("man 7 unix" for the gory details.)
+             */
+            
+            p_addr->sun_path[0] = 0;
+            memcpy(p_addr->sun_path + 1, name, namelen);
+        break;
+
+        default:
+            // invalid namespace id
+            return -1;
+    }
+
+    p_addr->sun_family = AF_LOCAL;
+    *alen = namelen + offsetof(struct sockaddr_un, sun_path) + 1;
+    return 0;
+error:
+    return -1;
+}
+int socket_local_server_bind(int s, const char *name, int namespaceId)
+{
+	struct sockaddr_un addr;
+	socklen_t alen;
+	int n;
+	int err;
+
+	err = socket_make_sockaddr_un(name, namespaceId, &addr, &alen);
+
+	if (err < 0) {
+		return -1;
+	}
+
+	/*  basically: if this is a filesystem path, unlink first */
+
+	n = 1;
+	setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &n, sizeof(n));
+
+	if(bind(s, (struct sockaddr *) &addr, alen) < 0) {
+		return -1;
+	}
+
+	return s;
+
+}
+#endif
+
+
 
 static inline int create_server_socket(const char* name)
 {

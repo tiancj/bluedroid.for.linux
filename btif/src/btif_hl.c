@@ -41,8 +41,10 @@
 #include <ctype.h>
 #include <sys/select.h>
 #include <sys/poll.h>
+#ifndef LINUX_NATIVE
 #include <cutils/sockets.h>
 #include <cutils/log.h>
+#endif 
 
 #include <hardware/bluetooth.h>
 #include <hardware/bt_hl.h>

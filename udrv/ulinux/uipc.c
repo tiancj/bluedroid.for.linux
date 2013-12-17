@@ -23,7 +23,6 @@
  *  Description:   UIPC implementation for bluedroid
  *
  *****************************************************************************/
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -48,7 +47,9 @@
 #include "data_types.h"
 #include "uipc.h"
 
+#ifndef LINUX_NATIVE
 #include <cutils/sockets.h>
+#endif
 #include "audio_a2dp_hw.h"
 
 /*****************************************************************************
@@ -65,6 +66,8 @@
 
 #define UIPC_LOCK() /*BTIF_TRACE_EVENT1(" %s lock", __FUNCTION__);*/ pthread_mutex_lock(&uipc_main.mutex);
 #define UIPC_UNLOCK() /*BTIF_TRACE_EVENT1("%s unlock", __FUNCTION__);*/ pthread_mutex_unlock(&uipc_main.mutex);
+
+#define ANDROID_SOCKET_NAMESPACE_ABSTRACT 0
 
 /*****************************************************************************
 **  Local type definitions
@@ -247,8 +250,15 @@ static int accept_server_socket(int sfd)
 static int uipc_main_init(void)
 {
     int i;
+#ifdef LINUX_NATIVE
+	pthread_mutexattr_t attr;
+#else
     const pthread_mutexattr_t attr = PTHREAD_MUTEX_RECURSIVE;
+#endif
     pthread_mutex_init(&uipc_main.mutex, &attr);
+#ifdef LINUX_NATIVE
+	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+#endif
 
     BTIF_TRACE_EVENT0("### uipc_main_init ###");
 

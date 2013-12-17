@@ -34,6 +34,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <stdio.h>
+#include <string.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/socket.h>
@@ -41,7 +42,11 @@
 #include <net/if.h>
 #include <linux/sockios.h>
 #include <sys/prctl.h>
+#ifdef LINUX_NATIVE
+#include <net/if.h>
+#else
 #include <linux/if.h>
+#endif
 #include <linux/if_tun.h>
 #include <linux/if_ether.h>
 
@@ -56,6 +61,11 @@
 #include "btif_sock_thread.h"
 #include "btif_sock_util.h"
 #include "btif_pan_internal.h"
+
+#ifdef LINUX_NATIVE
+#define ALOGE(...)
+#define ALOGI(...)
+#endif
 
 //#define PANU_DISABLED TRUE
 

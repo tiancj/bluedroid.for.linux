@@ -23,6 +23,7 @@
  *  Description:   Handsfree Profile Bluetooth Interface
  *
  ***********************************************************************************/
+#include <string.h>
 #include <hardware/bluetooth.h>
 #include <hardware/bt_sock.h>
 #include <sys/types.h>
@@ -52,7 +53,11 @@
 #include "bta_jv_co.h"
 #include "port_api.h"
 
+#ifndef LINUX_NATIVE
 #include <cutils/log.h>
+#else
+#define ALOGD(...)
+#endif
 #include <hardware/bluetooth.h>
 #define asrt(s) if(!(s)) APPL_TRACE_ERROR3("## %s assert %s failed at line:%d ##",__FUNCTION__, #s, __LINE__)
 

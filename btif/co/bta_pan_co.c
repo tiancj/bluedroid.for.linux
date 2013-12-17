@@ -24,6 +24,7 @@
  *
  *
  ***********************************************************************************/
+#include <string.h>
 #include "bta_api.h"
 #include "bta_pan_api.h"
 #include "bta_pan_ci.h"
@@ -38,13 +39,28 @@
 #include "bd.h"
 
 
+#ifndef LINUX_NATIVE
 #include <cutils/log.h>
 #define info(fmt, ...)  ALOGI ("%s: " fmt,__FUNCTION__,  ## __VA_ARGS__)
 #define debug(fmt, ...) ALOGD ("%s: " fmt,__FUNCTION__,  ## __VA_ARGS__)
 #define warn(fmt, ...) ALOGW ("## WARNING : %s: " fmt "##",__FUNCTION__,  ## __VA_ARGS__)
 #define error(fmt, ...) ALOGE ("## ERROR : %s: " fmt "##",__FUNCTION__,  ## __VA_ARGS__)
 #define asrt(s) if(!(s)) ALOGE ("## %s assert %s failed at line:%d ##",__FUNCTION__, #s, __LINE__)
+#else
+#define info(fmt, ...)  
+#define debug(fmt, ...) 
+#define warn(fmt, ...) 
+#define error(fmt, ...) 
+#define asrt(s) 
 
+#define ALOGI(...)
+#define ALOGD(...)
+#define ALOGW(...)
+#define ALOGE(...)
+#define ALOGV(...)
+
+
+#endif
 
 
 

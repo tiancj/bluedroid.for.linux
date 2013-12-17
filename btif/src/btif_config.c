@@ -39,7 +39,9 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <stdlib.h>
+#ifndef LINUX_NATIVE
 #include <private/android_filesystem_config.h>
+#endif
 
 #define LOG_TAG "btif_config"
 
@@ -584,7 +586,9 @@ static int save_cfg()
    if(btif_config_save_file(file_name_new))
     {
         cached_change = 0;
+#ifndef LINUX_NATIVE
         chown(file_name_new, -1, AID_NET_BT_STACK);
+#endif
         chmod(file_name_new, 0660);
         rename(file_name, file_name_old);
         rename(file_name_new, file_name);

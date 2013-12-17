@@ -26,6 +26,7 @@
 
 #define LOG_TAG "bt_lpm"
 
+#include <string.h>
 #include <utils/Log.h>
 #include <signal.h>
 #include <time.h>

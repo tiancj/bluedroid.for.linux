@@ -25,19 +25,23 @@
  *
  ***********************************************************************************/
 
+#ifndef LINUX_NATIVE
 #include <cutils/properties.h>
 #include <cutils/sched_policy.h>
+#include <utils/ThreadDefs.h>
+#endif
 #include <errno.h>
 #include <pthread.h>
 #include <sys/resource.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <utils/ThreadDefs.h>
 
 #define LOG_TAG "BT_UTILS"
 
+#ifndef LINUX_NATIVE
 #include <utils/Log.h>
+#endif
 
 #include "data_types.h"
 #include "bt_utils.h"
@@ -95,6 +99,7 @@ void bt_utils_cleanup() {
 **
 *******************************************************************************/
 static void check_do_scheduling_group(void) {
+#ifndef LINUX_NATIVE
     char buf[PROPERTY_VALUE_MAX];
     int len = property_get("debug.sys.noschedgroups", buf, "");
     if (len > 0) {
@@ -103,6 +108,7 @@ static void check_do_scheduling_group(void) {
             g_DoSchedulingGroup[g_TaskIdx] = temp == 0;
         }
     }
+#endif
 }
 
 /*****************************************************************************
@@ -115,6 +121,7 @@ static void check_do_scheduling_group(void) {
 **
 *******************************************************************************/
 void raise_priority_a2dp(tHIGH_PRIORITY_TASK high_task) {
+#ifndef LINUX_NATIVE
     int rc = 0;
     int tid = gettid();
 
@@ -135,5 +142,6 @@ void raise_priority_a2dp(tHIGH_PRIORITY_TASK high_task) {
     if (setpriority(PRIO_PROCESS, tid, ANDROID_PRIORITY_AUDIO) < 0) {
         ALOGW("failed to change priority tid: %d to %d", tid, ANDROID_PRIORITY_AUDIO);
     }
+#endif
 }
 

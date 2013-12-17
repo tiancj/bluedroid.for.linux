@@ -28,7 +28,9 @@
 #define BTIF_SOCK_UTIL_H
 
 #include <pthread.h>
+#ifndef LINUX_NATIVE
 #include <cutils/log.h>
+#endif
 
 /*******************************************************************************
 **  Functions
@@ -44,16 +46,24 @@ static inline void init_slot_lock( pthread_mutex_t* mutex)
 
 static inline void lock_slot(pthread_mutex_t* mutex)
 {
+#if 0
     if(mutex->value)
         pthread_mutex_lock(mutex);
     else ALOGE("mutex: %p is not initialized", mutex);
+#else
+        pthread_mutex_lock(mutex);
+#endif
 }
 
 static inline void unlock_slot(pthread_mutex_t* mutex)
 {
+#if 0
    if(mutex->value)
         pthread_mutex_unlock(mutex);
    else ALOGE("mutex: %p is not initialized", mutex);
+#else
+        pthread_mutex_unlock(mutex);
+#endif
 }
 
 void dump_bin(const char* title, const char* data, int size);

@@ -33,6 +33,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <fcntl.h>
+#include <stdarg.h>
 #include <sys/prctl.h>
 #include <linux/capability.h>
 
@@ -40,8 +41,10 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
+#ifndef LINUX_NATIVE
 #include <private/android_filesystem_config.h>
 #include <android/log.h>
+#endif
 
 #include <hardware/hardware.h>
 #include <hardware/bluetooth.h>
@@ -84,9 +87,11 @@ static bluetooth_device_t* bt_device;
 
 const bt_interface_t* sBtInterface = NULL;
 
+#ifndef LINUX_NATIVE
 static gid_t groups[] = { AID_NET_BT, AID_INET, AID_NET_BT_ADMIN,
                           AID_SYSTEM, AID_MISC, AID_SDCARD_RW,
                           AID_NET_ADMIN, AID_VPN};
+#endif
 
 /* Set to 1 when the Bluedroid stack is enabled */
 static unsigned char bt_enabled = 0;
@@ -152,6 +157,7 @@ static void bdt_shutdown(void)
 
 static void config_permissions(void)
 {
+#ifndef LINUX_NATIVE
     struct __user_cap_header_struct header;
     struct __user_cap_data_struct cap;
 
@@ -176,6 +182,7 @@ static void config_permissions(void)
 
     capset(&header, &cap);
     setgroups(sizeof(groups)/sizeof(groups[0]), groups);
+#endif
 }
 
 
@@ -440,6 +447,7 @@ int HAL_load(void)
 
     bdt_log("Loading HAL lib + extensions");
 
+#ifndef LINUX_NATIVE
     err = hw_get_module(BT_HARDWARE_MODULE_ID, (hw_module_t const**)&module);
     if (err == 0)
     {
@@ -449,6 +457,9 @@ int HAL_load(void)
             sBtInterface = bt_device->get_bluetooth_interface();
         }
     }
+#else
+	sBtInterface = bluetooth__get_bluetooth_interface();
+#endif
 
     bdt_log("HAL library loaded (%s)", strerror(err));
 

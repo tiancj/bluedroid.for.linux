@@ -33,7 +33,9 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include <ctype.h>
+#ifndef LINUX_NATIVE
 #include <cutils/properties.h>
+#endif
 
 #define LOG_TAG "BTIF_CORE"
 #include "btif_api.h"
@@ -344,7 +346,7 @@ static void btif_fetch_local_bdaddr(bt_bdaddr_t *local_addr)
     uint8_t valid_bda = FALSE;
     int val_size = 0;
     const uint8_t null_bdaddr[BD_ADDR_LEN] = {0,0,0,0,0,0};
-
+#ifndef LINUX_NATIVE
     /* Get local bdaddr storage path from property */
     if (property_get(PROPERTY_BT_BDADDR_PATH, val, NULL))
     {
@@ -391,6 +393,7 @@ static void btif_fetch_local_bdaddr(bt_bdaddr_t *local_addr)
             local_addr->address[0], local_addr->address[1], local_addr->address[2],
             local_addr->address[3], local_addr->address[4], local_addr->address[5]);
     }
+#endif
 
     /* Generate new BDA if necessary */
     if (!valid_bda)
@@ -413,8 +416,10 @@ static void btif_fetch_local_bdaddr(bt_bdaddr_t *local_addr)
         BTIF_TRACE_DEBUG2("No preset BDA. Generating BDA: %s for prop %s",
              (char*)bdstr, PERSIST_BDADDR_PROPERTY);
 
+#ifndef LINUX_NATIVE
         if (property_set(PERSIST_BDADDR_PROPERTY, (char*)bdstr) < 0)
             BTIF_TRACE_ERROR1("Failed to set random BDA in prop %s",PERSIST_BDADDR_PROPERTY);
+#endif
     }
 
     //save the bd address to config file

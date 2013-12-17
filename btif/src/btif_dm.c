@@ -25,13 +25,17 @@
  *
  ***********************************************************************************/
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include <hardware/bluetooth.h>
 
 #include <utils/Log.h>
+#ifndef LINUX_NATIVE
 #include <cutils/properties.h>
+#endif
 #include "gki.h"
 #include "btu.h"
 #include "bd.h"
@@ -1748,11 +1752,13 @@ void btif_dm_set_oob_for_io_req(tBTA_OOB_DATA  *p_oob_data)
 }
 #endif /* BTM_OOB_INCLUDED */
 
-#ifdef BTIF_DM_OOB_TEST
+#ifdef BTIF_DM_OOB_TEST 
 void btif_dm_load_local_oob(void)
 {
-    char prop_oob[32];
+    char prop_oob[32] = "3";
+#ifndef LINUX_NATIVE
     property_get("service.brcm.bt.oob", prop_oob, "3");
+#endif
     BTIF_TRACE_DEBUG1("btif_dm_load_local_oob prop_oob = %s",prop_oob);
     if (prop_oob[0] != '3')
     {
@@ -1775,7 +1781,7 @@ void btif_dm_proc_loc_oob(BOOLEAN valid, BT_OCTET16 c, BT_OCTET16 r)
     char *path_a = "/data/misc/bluedroid/LOCAL/a.key";
     char *path_b = "/data/misc/bluedroid/LOCAL/b.key";
     char *path = NULL;
-    char prop_oob[32];
+    char prop_oob[32] = "3";
     BTIF_TRACE_DEBUG1("btif_dm_proc_loc_oob: valid=%d", valid);
     if (oob_cb.sp_c[0] == 0 && oob_cb.sp_c[1] == 0 &&
         oob_cb.sp_c[2] == 0 && oob_cb.sp_c[3] == 0 &&
@@ -1784,7 +1790,9 @@ void btif_dm_proc_loc_oob(BOOLEAN valid, BT_OCTET16 c, BT_OCTET16 r)
         BTIF_TRACE_DEBUG0("save local OOB data in memory");
         memcpy(oob_cb.sp_c, c, BT_OCTET16_LEN);
         memcpy(oob_cb.sp_r, r, BT_OCTET16_LEN);
+#ifndef LINUX_NATIVE
         property_get("service.brcm.bt.oob", prop_oob, "3");
+#endif
         BTIF_TRACE_DEBUG1("btif_dm_proc_loc_oob prop_oob = %s",prop_oob);
         if (prop_oob[0] == '1')
             path = path_a;
@@ -1814,11 +1822,13 @@ BOOLEAN btif_dm_proc_rmt_oob(BD_ADDR bd_addr,  BT_OCTET16 p_c, BT_OCTET16 p_r)
     char *path_a = "/data/misc/bluedroid/LOCAL/a.key";
     char *path_b = "/data/misc/bluedroid/LOCAL/b.key";
     char *path = NULL;
-    char prop_oob[32];
+    char prop_oob[32] = "3";
     BOOLEAN result = FALSE;
     bt_bdaddr_t bt_bd_addr;
     bdcpy(oob_cb.oob_bdaddr, bd_addr);
+#ifndef LINUX_NATIVE
     property_get("service.brcm.bt.oob", prop_oob, "3");
+#endif
     BTIF_TRACE_DEBUG1("btif_dm_proc_rmt_oob prop_oob = %s",prop_oob);
     if (prop_oob[0] == '1')
         path = path_b;

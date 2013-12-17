@@ -26,6 +26,8 @@
 *****************************************************************************/
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <stdarg.h>
 #include <errno.h>
 #include <sys/times.h>
@@ -47,10 +49,12 @@
 #define GKI_TICK_TIMER_DEBUG FALSE
 #endif
 
-#define GKI_INFO(fmt, ...) ALOGI ("%s: " fmt, __FUNCTION__, ## __VA_ARGS__)
+//#define GKI_INFO(fmt, ...) ALOGI ("%s: " fmt, __FUNCTION__, ## __VA_ARGS__)
+#define GKI_INFO(fmt, ...) 
 
 /* always log errors */
-#define GKI_ERROR_LOG(fmt, ...)  ALOGE ("##### ERROR : %s: " fmt "#####", __FUNCTION__, ## __VA_ARGS__)
+//#define GKI_ERROR_LOG(fmt, ...)  ALOGE ("##### ERROR : %s: " fmt "#####", __FUNCTION__, ## __VA_ARGS__)
+#define GKI_ERROR_LOG(fmt, ...) 
 
 #if defined (GKI_TICK_TIMER_DEBUG) && (GKI_TICK_TIMER_DEBUG == TRUE)
 #define GKI_TIMER_TRACE(fmt, ...) ALOGI ("%s: " fmt, __FUNCTION__, ## __VA_ARGS__)
@@ -122,8 +126,10 @@ gki_pthread_info_t gki_pthread_info[GKI_MAX_TASKS];
 **  Externs
 ******************************************************************************/
 
+#ifndef LINUX_NATIVE
 extern int acquire_wake_lock(int lock, const char* id);
 extern int release_wake_lock(const char* id);
+#endif
 
 /*****************************************************************************
 **  Functions
@@ -521,12 +527,15 @@ void GKI_shutdown(void)
 #ifdef NO_GKI_RUN_RETURN
     shutdown_timer = 1;
 #endif
+
+#ifndef LINUX_NATIVE
     if (g_GkiTimerWakeLockOn)
     {
         GKI_TRACE("GKI_shutdown :  release_wake_lock(brcm_btld)");
         release_wake_lock(WAKE_LOCK_ID);
         g_GkiTimerWakeLockOn = 0;
     }
+#endif
 }
 
 /*******************************************************************************
@@ -565,16 +574,20 @@ void gki_system_tick_start_stop_cback(BOOLEAN start)
 
             GKI_TIMER_TRACE(">>> STOP GKI_timer_update(), wake_lock_count:%d", --wake_lock_count);
 
+#ifndef LINUX_NATIVE
             release_wake_lock(WAKE_LOCK_ID);
             g_GkiTimerWakeLockOn = 0;
+#endif
         }
     }
     else
     {
         /* restart GKI_timer_update() loop */
+#ifndef LINUX_NATIVE
         acquire_wake_lock(PARTIAL_WAKE_LOCK, WAKE_LOCK_ID);
 
         g_GkiTimerWakeLockOn = 1;
+#endif
         *p_run_cond = GKI_TIMER_TICK_RUN_COND;
 
 #ifdef NO_GKI_RUN_RETURN

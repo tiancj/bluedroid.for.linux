@@ -33,8 +33,10 @@
 #include <time.h>
 #include <fcntl.h>
 #include <ctype.h>
+#ifndef LINUX_NATIVE
 #include <cutils/sockets.h>
 #include <cutils/log.h>
+#endif
 #include "bta_api.h"
 #include "btm_api.h"
 #include "bta_sys.h"
